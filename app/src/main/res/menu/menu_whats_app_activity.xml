@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/menuItemWhatsAppActivityChat"
+        android:icon="@drawable/chat_menu_graphic"
+        android:title="Chat"
+        app:showAsAction="ifRoom" />
+    <item
+        android:id="@+id/menuItemWhatsAppActivityUserDirectory"
+        android:icon="@drawable/contacts_menu_graphic"
+        android:title="User Directory"
+        app:showAsAction="ifRoom" />
+    <item
+        android:id="@+id/menuItemWhatsAppActivityLogout"
+        android:title="Logout"
+        app:showAsAction="never" />
+</menu>
