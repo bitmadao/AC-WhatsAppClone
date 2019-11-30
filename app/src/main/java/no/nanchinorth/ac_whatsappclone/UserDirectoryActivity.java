@@ -6,6 +6,8 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
@@ -24,7 +26,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-public class UserDirectoryActivity extends AppCompatActivity implements SwipeRefreshLayout.OnRefreshListener {
+public class UserDirectoryActivity extends AppCompatActivity implements SwipeRefreshLayout.OnRefreshListener, AdapterView.OnItemClickListener {
 
     private ParseUser currentUser;
 
@@ -87,7 +89,7 @@ public class UserDirectoryActivity extends AppCompatActivity implements SwipeRef
 
     private void populateListView(){
         ParseQuery<ParseUser> parseQuery = ParseUser.getQuery();
-        parseQuery.whereNotEqualTo("objectId",currentUser.getObjectId());
+        parseQuery.whereNotEqualTo("username", currentUser.getUsername());
         parseQuery.orderByAscending("username");
 
         parseQuery.findInBackground(new FindCallback<ParseUser>() {
@@ -110,6 +112,7 @@ public class UserDirectoryActivity extends AppCompatActivity implements SwipeRef
                         );
 
                         listView.setAdapter(userArrayAdapter);
+                        listView.setOnItemClickListener(UserDirectoryActivity.this);
                     } else {
                         listView.setAdapter(
                                 new ArrayAdapter<>(UserDirectoryActivity.this,
@@ -174,5 +177,12 @@ public class UserDirectoryActivity extends AppCompatActivity implements SwipeRef
     private void transitionToLogin(){
         startActivity(new Intent(UserDirectoryActivity.this, LoginActivity.class));
         finish();
+    }
+
+    @Override
+    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+        Intent conversationActivityIntent = new Intent(UserDirectoryActivity.this, ConversationActivity.class);
+        conversationActivityIntent.putExtra("oppositeUsername",userArray.get(position));
+        startActivity(conversationActivityIntent);
     }
 }
