@@ -9,12 +9,17 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
 
 import com.parse.ParseUser;
 
 import static no.nanchinorth.ac_whatsappclone.ACWACHelperTools.*;
 
 public class WhatsAppActivity extends AppCompatActivity implements View.OnClickListener{
+
+
+    private ListView listView;
 
     private ParseUser currentUser;
 
@@ -29,6 +34,15 @@ public class WhatsAppActivity extends AppCompatActivity implements View.OnClickL
         } else {
             transitionToLogin();
         }
+
+        listView = findViewById(R.id.listViewWhatsAppActivity);
+        String[] noConversations = {"No conversations yet"};
+        ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(
+                WhatsAppActivity.this,
+                android.R.layout.simple_list_item_1,
+                noConversations);
+        listView.setAdapter(arrayAdapter);
+
 
 
 
