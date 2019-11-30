@@ -2,6 +2,7 @@ package no.nanchinorth.ac_whatsappclone;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -16,8 +17,9 @@ import com.parse.ParseUser;
 
 import static no.nanchinorth.ac_whatsappclone.ACWACHelperTools.*;
 
-public class WhatsAppActivity extends AppCompatActivity implements View.OnClickListener{
+public class WhatsAppActivity extends AppCompatActivity implements View.OnClickListener, SwipeRefreshLayout.OnRefreshListener {
 
+    private SwipeRefreshLayout swipeRefreshLayout;
 
     private ListView listView;
 
@@ -35,13 +37,12 @@ public class WhatsAppActivity extends AppCompatActivity implements View.OnClickL
             transitionToLogin();
         }
 
+        swipeRefreshLayout = findViewById(R.id.swipeRefreshLayoutWhatsAppActivityRoot);
+        swipeRefreshLayout.setOnRefreshListener(WhatsAppActivity.this);
+
         listView = findViewById(R.id.listViewWhatsAppActivity);
-        String[] noConversations = {"No conversations yet"};
-        ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(
-                WhatsAppActivity.this,
-                android.R.layout.simple_list_item_1,
-                noConversations);
-        listView.setAdapter(arrayAdapter);
+
+        populateListView();
 
 
 
@@ -75,10 +76,26 @@ public class WhatsAppActivity extends AppCompatActivity implements View.OnClickL
     }
 
     @Override
+    public void onRefresh() {
+        populateListView();
+        swipeRefreshLayout.setRefreshing(false);
+
+    }
+
+    @Override
     public void onClick(View v) {
 
     }
 
+    private void populateListView(){
+        String[] noConversations = {"No conversations yet"};
+        ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(
+                WhatsAppActivity.this,
+                android.R.layout.simple_list_item_1,
+                noConversations);
+        listView.setAdapter(arrayAdapter);
+
+    }
     private void transitionToUserDirectoryActivity(){
         startActivity(new Intent(WhatsAppActivity.this, UserDirectoryActivity.class));
         finish();
