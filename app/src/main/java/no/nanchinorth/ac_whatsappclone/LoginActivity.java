@@ -1,20 +1,21 @@
 package no.nanchinorth.ac_whatsappclone;
 
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
+
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.material.textfield.TextInputEditText;
 import com.parse.LogInCallback;
 import com.parse.ParseException;
 import com.parse.ParseUser;
 
-public class LoginActivity extends AppCompatActivity implements View.OnClickListener{
+public class LoginActivity extends AppCompatActivity implements View.OnClickListener, View.OnKeyListener {
 
     private TextInputEditText edtUsername;
     private TextInputEditText edtPassword;
@@ -36,8 +37,20 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         btnLogin = findViewById(R.id.btnLoginActivityLogin);
         btnNeedAccount = findViewById(R.id.btnLoginActivityNeedAccount);
 
+
+        edtPassword.setOnKeyListener(LoginActivity.this);
         btnLogin.setOnClickListener(LoginActivity.this);
         btnNeedAccount.setOnClickListener(LoginActivity.this);
+    }
+
+    @Override
+    public boolean onKey(View v, int keyCode, KeyEvent event) {
+        if(v.getId() == edtPassword.getId()) {
+            if (keyCode == KeyEvent.KEYCODE_ENTER && event.getAction() == KeyEvent.ACTION_DOWN) {
+                btnLoginTapped();
+            }
+        }
+        return false;
     }
 
     @Override

@@ -1,12 +1,13 @@
 package no.nanchinorth.ac_whatsappclone;
 
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
 import android.widget.Button;
+
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.material.textfield.TextInputEditText;
 import com.parse.ParseException;
@@ -14,7 +15,7 @@ import com.parse.ParseUser;
 import com.parse.SignUpCallback;
 import com.shashank.sony.fancytoastlib.FancyToast;
 
-public class SignUpActivity extends AppCompatActivity implements View.OnClickListener{
+public class SignUpActivity extends AppCompatActivity implements View.OnClickListener, View.OnKeyListener {
 
     private TextInputEditText edtUsername;
     private TextInputEditText edtEmail;
@@ -41,6 +42,8 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
         btnSignUp = findViewById(R.id.btnSignUpSignUp);
         btnHaveAccount = findViewById(R.id.btnSignUpHaveAccount);
 
+        edtPasswordConfirm.setOnKeyListener(SignUpActivity.this);
+
         btnSignUp.setOnClickListener(SignUpActivity.this);
         btnHaveAccount.setOnClickListener(SignUpActivity.this);
 
@@ -59,6 +62,17 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
                 break;
         }
 
+    }
+
+    @Override
+    public boolean onKey(View v, int keyCode, KeyEvent event) {
+        if(v.getId() == edtPasswordConfirm.getId()){
+            if(keyCode == KeyEvent.KEYCODE_ENTER && event.getAction() == KeyEvent.ACTION_DOWN){
+                btnSignUpTapped();
+            }
+        }
+
+        return false;
     }
 
     private void btnSignUpTapped(){
