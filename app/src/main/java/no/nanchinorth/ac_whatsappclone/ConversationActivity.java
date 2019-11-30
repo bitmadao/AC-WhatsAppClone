@@ -17,9 +17,14 @@ public class ConversationActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_conversation);
 
-        if(ParseUser.getCurrentUser() != null){
+        if(ParseUser.getCurrentUser() != null && getIntent().getStringExtra("oppositeUsername") != null){
             currentUser = ParseUser.getCurrentUser();
             oppositeUsername = getIntent().getStringExtra("oppositeUsername");
+
+        }else if (ParseUser.getCurrentUser() != null) {
+            startActivity(new Intent(ConversationActivity.this, WhatsAppActivity.class));
+            finish();
+            
         } else {
             startActivity(new Intent(ConversationActivity.this, LoginActivity.class));
             finish();
