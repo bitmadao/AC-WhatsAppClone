@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
@@ -16,10 +17,11 @@ import com.parse.ParseException;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
+import com.parse.SaveCallback;
+import com.shashank.sony.fancytoastlib.FancyToast;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 
 public class ConversationActivity extends AppCompatActivity implements View.OnClickListener {
@@ -30,12 +32,15 @@ public class ConversationActivity extends AppCompatActivity implements View.OnCl
     private EditText edtMessage;
     private Button btnSend;
 
-    ArrayList<HashMap<String, String>> conversationHistoryArrayList;
+    private boolean isConversationHistoryArrayListPopulated;
+    private ArrayList<String> conversationHistoryArrayList;
+    private ArrayList<String> conversationObjectIdsArrayList;
+    private ArrayAdapter<String> conversationHistoryArrayAdapter;
 
     private ParseUser currentUser;
     private String oppositeUsername;
 
-    String[] conversationPartiesArray;
+    private String[] conversationPartiesArray;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,6 +50,7 @@ public class ConversationActivity extends AppCompatActivity implements View.OnCl
         if(ParseUser.getCurrentUser() != null && getIntent().getStringExtra("oppositeUsername") != null){
             currentUser = ParseUser.getCurrentUser();
             oppositeUsername = getIntent().getStringExtra("oppositeUsername");
+            setTitle(String.format("Conversation with %s", oppositeUsername));
 
         }else if (ParseUser.getCurrentUser() != null) {
             startActivity(new Intent(ConversationActivity.this, WhatsAppActivity.class));
@@ -54,6 +60,10 @@ public class ConversationActivity extends AppCompatActivity implements View.OnCl
             startActivity(new Intent(ConversationActivity.this, LoginActivity.class));
             finish();
         }
+
+        listViewMessages = findViewById(R.id.listViewConversationActivity);
+
+        isConversationHistoryArrayListPopulated = false;
 
         edtMessage = findViewById(R.id.edtConversationActivityMessage);
         btnSend = findViewById(R.id.btnConversationActivitySend);
@@ -66,9 +76,48 @@ public class ConversationActivity extends AppCompatActivity implements View.OnCl
 
     @Override
     public void onClick(View v) {
-
+        if(v.getId() == btnSend.getId()){
+            btnSendTapped();
+        }
     }
 
+    private void btnSendTapped(){
+        if(edtMessage.getText().toString().isEmpty() || edtMessage.getText().toString().trim().length() <= 3){
+            FancyToast.makeText(ConversationActivity.this,
+                    "Message must be longer than 3 non-whitespace characters",
+                    FancyToast.LENGTH_SHORT,
+                    FancyToast.INFO,
+                    true)
+                    .show();
+            return;
+
+        }
+
+        ParseObject parseMessage = new ParseObject("Message");
+        parseMessage.put("sender", currentUser.getUsername());
+        parseMessage.put("receiver", oppositeUsername);
+        parseMessage.put("message", edtMessage.getText().toString().trim());
+
+        parseMessage.saveInBackground(new SaveCallback() {
+            @Override
+            public void done(ParseException e) {
+                if(e == null) {
+                    if(isConversationHistoryArrayListPopulated){
+                        updateMessagesListView();
+                    } else {
+                        populateMessagesListView();
+                    }
+                } else {
+                    FancyToast.makeText(ConversationActivity.this,
+                            getString(R.string.toast_generic_error),
+                            FancyToast.LENGTH_LONG,
+                            FancyToast.ERROR,
+                            true);
+                }
+            }
+        });
+
+    }
     private void populateMessagesListView(){
         ParseQuery<ParseObject> parseQuery = ParseQuery.getQuery("Message");
         parseQuery.whereContainedIn("sender", Arrays.asList(conversationPartiesArray));
@@ -79,16 +128,69 @@ public class ConversationActivity extends AppCompatActivity implements View.OnCl
             public void done(List<ParseObject> objects, ParseException e) {
                 if(e == null){
                     if(objects.size() > 0) {
+                        isConversationHistoryArrayListPopulated = true;
+                        conversationHistoryArrayList = new ArrayList<>();
+                        conversationObjectIdsArrayList = new ArrayList<>();
                         for (ParseObject object : objects) {
-                            Log.i("APPTAG",
-                                    String.format(
-                                            "%s says: %s",
-                                            object.getString("sender"),
-                                            object.getString("message")
-                                    )
-                            );
+                            conversationHistoryArrayList.add(String.format(
+                                    "%s says:\n %s",
+                                    object.getString("sender"),
+                                    object.getString("message")));
+                            conversationObjectIdsArrayList.add(object.getObjectId());
                         }
+
+                        conversationHistoryArrayAdapter =
+                                new ArrayAdapter<>(
+                                        ConversationActivity.this,
+                                        android.R.layout.simple_list_item_1,
+                                        conversationHistoryArrayList
+                                );
+
+                        listViewMessages.setAdapter(conversationHistoryArrayAdapter);
+
+                    } else {
+
+                        ArrayAdapter<String> dummyAdapter = new ArrayAdapter<>(ConversationActivity.this,android.R.layout.simple_list_item_1,
+                                new String[]{(String.format("No conversation history with %s yet.",oppositeUsername))});
+                        listViewMessages.setAdapter(dummyAdapter);
                     }
+                }
+            }
+        });
+
+    }
+
+    private void updateMessagesListView(){
+        ParseQuery<ParseObject> parseQuery = ParseQuery.getQuery("Message");
+        parseQuery.whereContainedIn("sender",Arrays.asList(conversationPartiesArray));
+        parseQuery.whereContainedIn("receiver",Arrays.asList(conversationPartiesArray));
+        parseQuery.whereNotContainedIn("objectId",conversationObjectIdsArrayList);
+
+        parseQuery.findInBackground(new FindCallback<ParseObject>() {
+            @Override
+            public void done(List<ParseObject> objects, ParseException e) {
+                if(e == null){
+                    if(objects.size() > 0){
+                        for(ParseObject object : objects){
+                            conversationHistoryArrayList.add(String.format(
+                                    "%s says:\n %s",
+                                    object.getString("sender"),
+                                    object.getString("message")));
+                            conversationObjectIdsArrayList.add(object.getObjectId());
+                        }
+
+                        conversationHistoryArrayAdapter.notifyDataSetChanged();
+                    }
+                } else {
+                    Log.i("APPTAG", e.getMessage());
+                    FancyToast.makeText(
+                            ConversationActivity.this,
+                            getString(R.string.toast_generic_error),
+                            FancyToast.LENGTH_LONG,
+                            FancyToast.ERROR,
+                            true)
+                            .show();
+
                 }
             }
         });
