@@ -4,19 +4,24 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.KeyEvent;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.constraintlayout.widget.ConstraintLayout;
 
 import com.google.android.material.textfield.TextInputEditText;
 import com.parse.LogInCallback;
 import com.parse.ParseException;
 import com.parse.ParseUser;
 
-public class LoginActivity extends AppCompatActivity implements View.OnClickListener, View.OnKeyListener {
+import static no.nanchinorth.ac_whatsappclone.ACWACHelperTools.hideSoftKeyboard;
 
+public class LoginActivity extends AppCompatActivity implements View.OnClickListener, View.OnKeyListener, View.OnTouchListener {
+
+    private ConstraintLayout constraintLayout;
     private TextInputEditText edtUsername;
     private TextInputEditText edtPassword;
 
@@ -31,6 +36,8 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             transitionToWhatsAppActivity();
         }
 
+        constraintLayout = findViewById(R.id.constraintLayoutLoginActivityRoot);
+
         edtUsername = findViewById(R.id.textInputEditTextLoginActivityUsername);
         edtPassword = findViewById(R.id.textInputEditTextLoginActivityPassword);
 
@@ -38,19 +45,10 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         btnNeedAccount = findViewById(R.id.btnLoginActivityNeedAccount);
 
 
+        constraintLayout.setOnTouchListener(LoginActivity.this);
         edtPassword.setOnKeyListener(LoginActivity.this);
         btnLogin.setOnClickListener(LoginActivity.this);
         btnNeedAccount.setOnClickListener(LoginActivity.this);
-    }
-
-    @Override
-    public boolean onKey(View v, int keyCode, KeyEvent event) {
-        if(v.getId() == edtPassword.getId()) {
-            if (keyCode == KeyEvent.KEYCODE_ENTER && event.getAction() == KeyEvent.ACTION_DOWN) {
-                btnLoginTapped();
-            }
-        }
-        return false;
     }
 
     @Override
@@ -65,6 +63,24 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                 break;
         }
 
+    }
+
+    @Override
+    public boolean onKey(View v, int keyCode, KeyEvent event) {
+        if(v.getId() == edtPassword.getId()) {
+            if (keyCode == KeyEvent.KEYCODE_ENTER && event.getAction() == KeyEvent.ACTION_DOWN) {
+                btnLoginTapped();
+                hideSoftKeyboard(LoginActivity.this, v);
+            }
+        }
+        return false;
+    }
+
+    @Override
+    public boolean onTouch(View v, MotionEvent event) {
+
+        hideSoftKeyboard(LoginActivity.this, v);
+        return false;
     }
 
     private void btnLoginTapped() {

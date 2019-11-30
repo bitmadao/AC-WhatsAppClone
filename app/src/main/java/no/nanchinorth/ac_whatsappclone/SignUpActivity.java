@@ -4,10 +4,12 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.KeyEvent;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.constraintlayout.widget.ConstraintLayout;
 
 import com.google.android.material.textfield.TextInputEditText;
 import com.parse.ParseException;
@@ -15,8 +17,12 @@ import com.parse.ParseUser;
 import com.parse.SignUpCallback;
 import com.shashank.sony.fancytoastlib.FancyToast;
 
-public class SignUpActivity extends AppCompatActivity implements View.OnClickListener, View.OnKeyListener {
+import static no.nanchinorth.ac_whatsappclone.ACWACHelperTools.hideSoftKeyboard;
 
+public class SignUpActivity extends AppCompatActivity implements View.OnClickListener, View.OnKeyListener, View.OnTouchListener {
+
+
+    private ConstraintLayout constraintLayout;
     private TextInputEditText edtUsername;
     private TextInputEditText edtEmail;
     private TextInputEditText edtPassword;
@@ -24,6 +30,15 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
 
     private Button btnSignUp;
     private Button btnHaveAccount;
+
+    @Override
+    public boolean onTouch(View v, MotionEvent event) {
+        if(v.getId() == constraintLayout.getId()){
+            hideSoftKeyboard(SignUpActivity.this, v);
+        }
+
+        return false;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,6 +49,8 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
             transitionToWhatsAppActivity();
         }
 
+        constraintLayout = findViewById(R.id.constraintLayoutSignUpActivityRoot);
+
         edtUsername = findViewById(R.id.textInputEditTextSignUpActivityUsername);
         edtEmail = findViewById(R.id.textInputEditTextSignUpActivityEmail);
         edtPassword = findViewById(R.id.textInputEditTextSignUpActivityPassword);
@@ -41,6 +58,8 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
 
         btnSignUp = findViewById(R.id.btnSignUpSignUp);
         btnHaveAccount = findViewById(R.id.btnSignUpHaveAccount);
+
+        constraintLayout.setOnTouchListener(SignUpActivity.this);
 
         edtPasswordConfirm.setOnKeyListener(SignUpActivity.this);
 
@@ -69,6 +88,7 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
         if(v.getId() == edtPasswordConfirm.getId()){
             if(keyCode == KeyEvent.KEYCODE_ENTER && event.getAction() == KeyEvent.ACTION_DOWN){
                 btnSignUpTapped();
+                hideSoftKeyboard(SignUpActivity.this, v);
             }
         }
 
