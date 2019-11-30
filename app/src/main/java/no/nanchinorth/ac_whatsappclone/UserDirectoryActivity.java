@@ -20,6 +20,8 @@ import com.parse.ParseUser;
 import com.shashank.sony.fancytoastlib.FancyToast;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 public class UserDirectoryActivity extends AppCompatActivity implements SwipeRefreshLayout.OnRefreshListener {
@@ -29,11 +31,18 @@ public class UserDirectoryActivity extends AppCompatActivity implements SwipeRef
     private SwipeRefreshLayout swipeRefreshLayout;
     private ListView listView;
 
+    private boolean isUserArrayPopulated;
+    private ArrayList<String> userArray;
+    private ArrayAdapter<String> userArrayAdapter;
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_user_directory);
+
+        isUserArrayPopulated = false ;
 
         if(ParseUser.getCurrentUser() != null){
             currentUser = ParseUser.getCurrentUser();
@@ -67,7 +76,12 @@ public class UserDirectoryActivity extends AppCompatActivity implements SwipeRef
 
     @Override
     public void onRefresh() {
-        populateListView();
+        if(isUserArrayPopulated) {
+            updateListView();
+        } else {
+            populateListView();
+
+        }
         swipeRefreshLayout.setRefreshing(false);
     }
 
@@ -81,19 +95,21 @@ public class UserDirectoryActivity extends AppCompatActivity implements SwipeRef
             public void done(List<ParseUser> objects, ParseException e) {
                 if(e == null){
                     if(objects.size() > 0) {
-                        ArrayList<String> userNames = new ArrayList<>();
+                        isUserArrayPopulated = true;
+
+                        userArray = new ArrayList<>();
 
                         for(ParseUser parseUser: objects){
-                            userNames.add(parseUser.getUsername());
+                            userArray.add(parseUser.getUsername());
                         }
 
-                        listView.setAdapter(
-                                new ArrayAdapter<>(
-                                        UserDirectoryActivity.this,
-                                        android.R.layout.simple_list_item_1,
-                                        userNames
-                                )
+                        userArrayAdapter = new ArrayAdapter<>(
+                                UserDirectoryActivity.this,
+                                android.R.layout.simple_list_item_1,
+                                userArray
                         );
+
+                        listView.setAdapter(userArrayAdapter);
                     } else {
                         listView.setAdapter(
                                 new ArrayAdapter<>(UserDirectoryActivity.this,
@@ -111,6 +127,43 @@ public class UserDirectoryActivity extends AppCompatActivity implements SwipeRef
                 }
             }
         });
+    }
+
+    public void updateListView(){
+        ParseQuery<ParseUser> updateUserArrayQuery = ParseUser.getQuery();
+        updateUserArrayQuery.whereNotEqualTo("username", currentUser.getUsername());
+        updateUserArrayQuery.whereNotContainedIn("username",userArray);
+
+        updateUserArrayQuery.findInBackground(new FindCallback<ParseUser>() {
+            @Override
+            public void done(List<ParseUser> objects, ParseException e) {
+                if(e == null) {
+                    if(objects.size() > 0){
+                        for(ParseUser parseUser : objects){
+                            userArray.add(parseUser.getUsername());
+                        }
+
+                        Collections.sort(userArray, new Comparator<String>() {
+                            @Override
+                            public int compare(String o1, String o2) {
+                                return o1.compareToIgnoreCase(o2);
+                            }
+                        });
+
+                        userArrayAdapter.notifyDataSetChanged();
+                    } else {
+                        FancyToast.makeText(
+                                UserDirectoryActivity.this,
+                                "User Directory is up-to-date",
+                                FancyToast.LENGTH_SHORT,
+                                FancyToast.INFO,
+                                true)
+                            .show();
+                    }
+                }
+            }
+        });
+
     }
 
     private void transitionToWhatsAppActivity(){
