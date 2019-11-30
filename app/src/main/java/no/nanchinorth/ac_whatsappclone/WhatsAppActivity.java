@@ -67,7 +67,7 @@ public class WhatsAppActivity extends AppCompatActivity implements View.OnClickL
                 break;
 
             case R.id.menuItemWhatsAppActivityUserDirectory:
-
+                transitionToUserDirectoryActivity();
                 break;
         }
 
@@ -76,6 +76,12 @@ public class WhatsAppActivity extends AppCompatActivity implements View.OnClickL
 
     @Override
     public void onClick(View v) {
+
+    }
+
+    private void transitionToUserDirectoryActivity(){
+        startActivity(new Intent(WhatsAppActivity.this, UserDirectoryActivity.class));
+        finish();
 
     }
 
