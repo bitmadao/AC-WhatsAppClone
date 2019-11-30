@@ -2,18 +2,33 @@ package no.nanchinorth.ac_whatsappclone;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
+import com.parse.FindCallback;
+import com.parse.ParseException;
+import com.parse.ParseQuery;
 import com.parse.ParseUser;
+import com.shashank.sony.fancytoastlib.FancyToast;
 
-public class UserDirectoryActivity extends AppCompatActivity {
+import java.util.ArrayList;
+import java.util.List;
 
-    ParseUser currentUser;
+public class UserDirectoryActivity extends AppCompatActivity implements SwipeRefreshLayout.OnRefreshListener {
+
+    private ParseUser currentUser;
+
+    private SwipeRefreshLayout swipeRefreshLayout;
+    private ListView listView;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -26,6 +41,13 @@ public class UserDirectoryActivity extends AppCompatActivity {
         } else {
             transitionToLogin();
         }
+
+        swipeRefreshLayout = findViewById(R.id.swipeRefreshLayoutUserDirectoryActivityRoot);
+        listView = findViewById(R.id.listViewUserDirectoryActivity);
+
+        swipeRefreshLayout.setOnRefreshListener(UserDirectoryActivity.this);
+        populateListView();
+
     }
 
     @Override
@@ -41,6 +63,54 @@ public class UserDirectoryActivity extends AppCompatActivity {
             transitionToWhatsAppActivity();
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onRefresh() {
+        populateListView();
+        swipeRefreshLayout.setRefreshing(false);
+    }
+
+    private void populateListView(){
+        ParseQuery<ParseUser> parseQuery = ParseUser.getQuery();
+        parseQuery.whereNotEqualTo("objectId",currentUser.getObjectId());
+        parseQuery.orderByAscending("username");
+
+        parseQuery.findInBackground(new FindCallback<ParseUser>() {
+            @Override
+            public void done(List<ParseUser> objects, ParseException e) {
+                if(e == null){
+                    if(objects.size() > 0) {
+                        ArrayList<String> userNames = new ArrayList<>();
+
+                        for(ParseUser parseUser: objects){
+                            userNames.add(parseUser.getUsername());
+                        }
+
+                        listView.setAdapter(
+                                new ArrayAdapter<>(
+                                        UserDirectoryActivity.this,
+                                        android.R.layout.simple_list_item_1,
+                                        userNames
+                                )
+                        );
+                    } else {
+                        listView.setAdapter(
+                                new ArrayAdapter<>(UserDirectoryActivity.this,
+                                        android.R.layout.simple_list_item_1,
+                                        new String[]{"No users yet..."})
+                        );
+                    }
+                } else {
+                    Log.i("APPTAG", e.getMessage());
+                    FancyToast.makeText(
+                            UserDirectoryActivity.this,
+                            getString(R.string.toast_generic_error),
+                            FancyToast.LENGTH_LONG,FancyToast.ERROR,true)
+                        .show();
+                }
+            }
+        });
     }
 
     private void transitionToWhatsAppActivity(){
