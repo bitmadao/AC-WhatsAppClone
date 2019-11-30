@@ -5,13 +5,13 @@ import android.content.Intent;
 import android.util.Log;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.parse.LogOutCallback;
 import com.parse.ParseException;
 import com.parse.ParseUser;
+import com.shashank.sony.fancytoastlib.FancyToast;
 
 import static android.content.Context.INPUT_METHOD_SERVICE;
 
@@ -24,10 +24,12 @@ public class ACWACHelperTools {
             inputMethodManager.hideSoftInputFromWindow(activityLayout.getWindowToken(), 0);
         } catch(Exception e) {
             Log.i("APPTAG",e.getMessage());
-            Toast.makeText(
+            FancyToast.makeText(
                     context,
                     context.getString(R.string.toast_generic_error),
-                    Toast.LENGTH_LONG)
+                    FancyToast.LENGTH_LONG,
+                    FancyToast.ERROR,
+                    true)
                     .show();
         }
 
