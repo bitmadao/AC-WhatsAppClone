@@ -105,6 +105,7 @@ public class ConversationActivity extends AppCompatActivity implements View.OnCl
                 if(e == null) {
 
                     if(isConversationHistoryArrayListPopulated){
+                        edtMessage.setText("");
                         updateMessagesListView();
                     } else {
                         currentUser.add("inContact", oppositeUsername);
@@ -117,8 +118,10 @@ public class ConversationActivity extends AppCompatActivity implements View.OnCl
                             }
                         });
                         populateMessagesListView();
-
+                        edtMessage.setText("");
                     }
+
+
                 } else {
                     logAndFancyToastException(ConversationActivity.this, e);
                 }
