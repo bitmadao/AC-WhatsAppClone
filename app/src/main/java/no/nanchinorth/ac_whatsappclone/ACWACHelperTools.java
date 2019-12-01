@@ -49,4 +49,15 @@ public class ACWACHelperTools {
             }
         });
     }
+
+    public static void logAndFancyToastException(Context context, Exception e){
+        Log.i("APPTAG", e.getMessage());
+        FancyToast.makeText(
+                context,
+                context.getString(R.string.toast_generic_error),
+                FancyToast.LENGTH_LONG,
+                FancyToast.ERROR,
+                true)
+            .show();
+    }
 }
