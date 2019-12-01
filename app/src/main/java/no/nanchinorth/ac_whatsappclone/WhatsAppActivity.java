@@ -1,11 +1,8 @@
 package no.nanchinorth.ac_whatsappclone;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
-
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -13,11 +10,24 @@ import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
+
+import com.parse.FindCallback;
+import com.parse.ParseException;
+import com.parse.ParseObject;
+import com.parse.ParseQuery;
 import com.parse.ParseUser;
 
-import static no.nanchinorth.ac_whatsappclone.ACWACHelperTools.*;
+import java.util.Arrays;
+import java.util.List;
+
+import static no.nanchinorth.ac_whatsappclone.ACWACHelperTools.logoutParseUser;
 
 public class WhatsAppActivity extends AppCompatActivity implements View.OnClickListener, SwipeRefreshLayout.OnRefreshListener {
+
+    private boolean isListViewPopulated;
 
     private SwipeRefreshLayout swipeRefreshLayout;
 
@@ -36,6 +46,8 @@ public class WhatsAppActivity extends AppCompatActivity implements View.OnClickL
         } else {
             transitionToLogin();
         }
+
+        isListViewPopulated = false ;
 
         swipeRefreshLayout = findViewById(R.id.swipeRefreshLayoutWhatsAppActivityRoot);
         swipeRefreshLayout.setOnRefreshListener(WhatsAppActivity.this);
@@ -88,12 +100,44 @@ public class WhatsAppActivity extends AppCompatActivity implements View.OnClickL
     }
 
     private void populateListView(){
-        String[] noConversations = {"No conversations yet"};
-        ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(
-                WhatsAppActivity.this,
-                android.R.layout.simple_list_item_1,
-                noConversations);
-        listView.setAdapter(arrayAdapter);
+        if(currentUser.getList("inContact") != null){
+            List<String> usersInContact = currentUser.getList("inContact");
+
+
+            for(String contactUsername: usersInContact){
+
+                List<String> conversationPartiesList = Arrays.asList(currentUser.getUsername(), contactUsername);
+
+                ParseQuery<ParseObject> conversationQuery = ParseQuery.getQuery("Message");
+                conversationQuery.whereContainedIn("sender", conversationPartiesList);
+                conversationQuery.whereContainedIn("receiver", conversationPartiesList);
+                conversationQuery.orderByDescending("createdAt");
+                conversationQuery.setLimit(1);
+
+                conversationQuery.findInBackground(new FindCallback<ParseObject>() {
+                    @Override
+                    public void done(List<ParseObject> objects, ParseException e) {
+                        if(objects.size() > 0){
+                            Log.i("APPTAG", objects.get(0).getString("message"));
+
+                        }
+
+                    }
+                });
+
+            }
+
+
+        } else {
+            String[] noConversations = {"No conversations yet"};
+            ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(
+                    WhatsAppActivity.this,
+                    android.R.layout.simple_list_item_1,
+                    noConversations);
+            listView.setAdapter(arrayAdapter);
+
+        }
+
 
     }
     private void transitionToUserDirectoryActivity(){
