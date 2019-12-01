@@ -2,7 +2,6 @@ package no.nanchinorth.ac_whatsappclone;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -23,6 +22,8 @@ import com.shashank.sony.fancytoastlib.FancyToast;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
+import static no.nanchinorth.ac_whatsappclone.ACWACHelperTools.logAndFancyToastException;
 
 public class ConversationActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -102,17 +103,24 @@ public class ConversationActivity extends AppCompatActivity implements View.OnCl
             @Override
             public void done(ParseException e) {
                 if(e == null) {
+
                     if(isConversationHistoryArrayListPopulated){
                         updateMessagesListView();
                     } else {
+                        currentUser.add("inContact", oppositeUsername);
+                        currentUser.saveInBackground(new SaveCallback() {
+                            @Override
+                            public void done(ParseException e) {
+                                if(e != null){
+                                    logAndFancyToastException(ConversationActivity.this, e);
+                                }
+                            }
+                        });
                         populateMessagesListView();
+
                     }
                 } else {
-                    FancyToast.makeText(ConversationActivity.this,
-                            getString(R.string.toast_generic_error),
-                            FancyToast.LENGTH_LONG,
-                            FancyToast.ERROR,
-                            true);
+                    logAndFancyToastException(ConversationActivity.this, e);
                 }
             }
         });
@@ -182,15 +190,7 @@ public class ConversationActivity extends AppCompatActivity implements View.OnCl
                         conversationHistoryArrayAdapter.notifyDataSetChanged();
                     }
                 } else {
-                    Log.i("APPTAG", e.getMessage());
-                    FancyToast.makeText(
-                            ConversationActivity.this,
-                            getString(R.string.toast_generic_error),
-                            FancyToast.LENGTH_LONG,
-                            FancyToast.ERROR,
-                            true)
-                            .show();
-
+                    logAndFancyToastException(ConversationActivity.this, e);
                 }
             }
         });
