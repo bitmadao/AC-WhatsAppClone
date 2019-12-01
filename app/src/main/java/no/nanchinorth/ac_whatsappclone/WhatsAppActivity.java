@@ -19,6 +19,7 @@ import com.parse.ParseException;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
+import com.parse.SaveCallback;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -26,6 +27,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+import static no.nanchinorth.ac_whatsappclone.ACWACHelperTools.logAndFancyToastException;
 import static no.nanchinorth.ac_whatsappclone.ACWACHelperTools.logoutParseUser;
 
 public class WhatsAppActivity extends AppCompatActivity implements
@@ -67,7 +69,7 @@ public class WhatsAppActivity extends AppCompatActivity implements
 
         listView = findViewById(R.id.listViewWhatsAppActivity);
 
-        populateListView();
+        checkForNewContacts();
 
 
 
@@ -119,11 +121,11 @@ public class WhatsAppActivity extends AppCompatActivity implements
 
         startActivity(conversationActivityIntent);
     }
-    private void populateListView(){
+
+    private void checkForNewContacts(){
+        inContactArrayList = new ArrayList<>();
         if(currentUser.getList("inContact") != null){
-
             inContactArrayList.addAll(currentUser.<String>getList("inContact"));
-
             // Sort ArrayList to ensure alphabetic listing of conversations...
             Collections.sort(inContactArrayList, new Comparator<String>() {
                 @Override
@@ -131,6 +133,57 @@ public class WhatsAppActivity extends AppCompatActivity implements
                     return s1.compareToIgnoreCase(s2);
                 }
             });
+        }
+        final ArrayList<String> newContactsList = new ArrayList<>();
+        ParseQuery<ParseObject> checkForNewContactsQuery = ParseQuery.getQuery("Message");
+        checkForNewContactsQuery.whereEqualTo("receiver", currentUser.getUsername());
+        checkForNewContactsQuery.whereNotContainedIn("sender", inContactArrayList);
+
+        checkForNewContactsQuery.orderByDescending("createdAt");
+        checkForNewContactsQuery.findInBackground(new FindCallback<ParseObject>() {
+            @Override
+            public void done(List<ParseObject> objects, ParseException e) {
+                if(e == null){
+                    if(objects.size() > 0) {
+                        for(ParseObject object : objects) {
+                            if (!newContactsList.contains(object.getString("sender"))){
+                                newContactsList.add(object.getString("sender"));
+                            }
+                        }
+
+                        currentUser.addAll("inContact",newContactsList);
+                        currentUser.saveInBackground(new SaveCallback() {
+                            @Override
+                            public void done(ParseException e) {
+                                if(e != null){
+                                    logAndFancyToastException(WhatsAppActivity.this, e);
+                                } else {
+                                    inContactArrayList = new ArrayList<>();
+                                    inContactArrayList.addAll(currentUser.<String>getList("inContact"));
+                                    // Sort ArrayList to ensure alphabetic listing of conversations...
+                                    Collections.sort(inContactArrayList, new Comparator<String>() {
+                                        @Override
+                                        public int compare(String s1, String s2) {
+                                            return s1.compareToIgnoreCase(s2);
+                                        }
+                                    });
+
+                                    populateListView();
+                                }
+                            }
+                        });
+                    } else {
+                        populateListView();
+                    }
+                } else {
+                    logAndFancyToastException(WhatsAppActivity.this, e);
+                }
+            }
+        });
+    }
+
+    private void populateListView(){
+        if(currentUser.getList("inContact") != null){
 
             recentConversationArrayList = new ArrayList<>();
             listedMessageIds = new ArrayList<>();
@@ -174,11 +227,41 @@ public class WhatsAppActivity extends AppCompatActivity implements
 
                     }
                 });
-
             }
 
-
         } else {
+            final ArrayList<String> newContactsList = new ArrayList<>();
+            ParseQuery<ParseObject> checkForNewContactsQuery = ParseQuery.getQuery("Message");
+            checkForNewContactsQuery.whereEqualTo("receiver", currentUser.getUsername());
+
+            checkForNewContactsQuery.orderByDescending("createdAt");
+            checkForNewContactsQuery.findInBackground(new FindCallback<ParseObject>() {
+                @Override
+                public void done(List<ParseObject> objects, ParseException e) {
+                    if(e == null){
+                        if(objects.size() > 0) {
+                            for(ParseObject object : objects) {
+                                if (!newContactsList.contains(object.getString("sender"))){
+                                    newContactsList.add(object.getString("sender"));
+                                }
+                            }
+
+                            currentUser.addAll("inContact",newContactsList);
+                            currentUser.saveInBackground(new SaveCallback() {
+                                @Override
+                                public void done(ParseException e) {
+                                    if(e != null){
+                                        logAndFancyToastException(WhatsAppActivity.this, e);
+                                    }
+                                }
+                            });
+                        }
+                    } else {
+                        logAndFancyToastException(WhatsAppActivity.this, e);
+                    }
+                }
+            });
+
             String[] noConversations = {"No conversations yet"};
             ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(
                     WhatsAppActivity.this,
