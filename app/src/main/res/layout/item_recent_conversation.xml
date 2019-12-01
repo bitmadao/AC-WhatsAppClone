@@ -19,14 +19,17 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="80"
-            android:text="User: Most Recent message..." />
+            android:text="User: Most Recent message..."
+            android:textAlignment="viewStart" />
 
         <TextView
             android:id="@+id/txtItemRecentConversationLastMessageDate"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="20"
-            android:text="Date" />
+            android:text="Date"
+            android:textAlignment="viewEnd"
+            android:textSize="12sp" />
     </LinearLayout>
 
 </LinearLayout>

@@ -13,12 +13,22 @@ public class RecentConversation {
 
     public RecentConversation(String currentUser, String contactUsername, ParseObject messageObject){
         this.conversationOpponent = contactUsername;
+        StringBuilder stringBuilder = new StringBuilder();
 
         if(messageObject.getString("sender").equals(currentUser)){
-            this.lastMessage = String.format("You: %s", messageObject.getString("message"));
+            stringBuilder.append("You: ");
         } else {
-            this.lastMessage = String.format("%s: %s", messageObject.getString("sender"), messageObject.getString("message"));
+            stringBuilder.append(messageObject.getString("sender")).append(": ");
         }
+
+        if(messageObject.getString("message").length() > 35) {
+            stringBuilder.append(messageObject.getString("message").substring(0, 34)).append("...");
+        } else {
+            stringBuilder.append(messageObject.getString("message"));
+        }
+
+        this.lastMessage = stringBuilder.toString();
+
         DateFormat dateFormat = DateFormat.getDateInstance(DateFormat.SHORT, Locale.JAPANESE);
         this.lastMessageDate = dateFormat.format(messageObject.getCreatedAt());
 
