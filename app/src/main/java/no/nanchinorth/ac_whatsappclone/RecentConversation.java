@@ -2,6 +2,9 @@ package no.nanchinorth.ac_whatsappclone;
 
 import com.parse.ParseObject;
 
+import java.text.DateFormat;
+import java.util.Locale;
+
 public class RecentConversation {
 
     private String conversationOpponent;
@@ -16,9 +19,20 @@ public class RecentConversation {
         } else {
             this.lastMessage = String.format("%s: %s", messageObject.getString("sender"), messageObject.getString("message"));
         }
+        DateFormat dateFormat = DateFormat.getDateInstance(DateFormat.SHORT, Locale.JAPANESE);
+        this.lastMessageDate = dateFormat.format(messageObject.getCreatedAt());
 
-        this.lastMessageDate = messageObject.getCreatedAt().toString();
+    }
 
+    public String getConversationOpponent() {
+        return conversationOpponent;
+    }
 
+    public String getLastMessage() {
+        return lastMessage;
+    }
+
+    public String getLastMessageDate() {
+        return lastMessageDate;
     }
 }
