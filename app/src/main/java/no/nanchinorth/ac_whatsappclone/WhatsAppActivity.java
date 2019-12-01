@@ -2,11 +2,11 @@ package no.nanchinorth.ac_whatsappclone;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
@@ -22,14 +22,21 @@ import com.parse.ParseUser;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import static no.nanchinorth.ac_whatsappclone.ACWACHelperTools.logoutParseUser;
 
-public class WhatsAppActivity extends AppCompatActivity implements View.OnClickListener, SwipeRefreshLayout.OnRefreshListener {
+public class WhatsAppActivity extends AppCompatActivity implements
+        View.OnClickListener,
+        SwipeRefreshLayout.OnRefreshListener,
+        AdapterView.OnItemClickListener {
 
     private boolean isListViewPopulated;
     private ArrayList<String> listedMessageIds;
+
+    ArrayList<String> inContactArrayList;
 
     private ArrayList<RecentConversation> recentConversationArrayList;
     private RecentConversationAdapter recentConversationAdapter;
@@ -47,6 +54,7 @@ public class WhatsAppActivity extends AppCompatActivity implements View.OnClickL
 
         if(ParseUser.getCurrentUser() != null){
             currentUser = ParseUser.getCurrentUser();
+            inContactArrayList = new ArrayList<>();
             setTitle(String.format("Conversations: %s", currentUser.getUsername()));
         } else {
             transitionToLogin();
@@ -104,15 +112,30 @@ public class WhatsAppActivity extends AppCompatActivity implements View.OnClickL
 
     }
 
+    @Override
+    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+        Intent conversationActivityIntent = new Intent(WhatsAppActivity.this, ConversationActivity.class);
+        conversationActivityIntent.putExtra("oppositeUsername", inContactArrayList.get(position));
+
+        startActivity(conversationActivityIntent);
+    }
     private void populateListView(){
         if(currentUser.getList("inContact") != null){
-            List<String> usersInContact = currentUser.getList("inContact");
+
+            inContactArrayList.addAll(currentUser.<String>getList("inContact"));
+
+            // Sort ArrayList to ensure alphabetic listing of conversations...
+            Collections.sort(inContactArrayList, new Comparator<String>() {
+                @Override
+                public int compare(String s1, String s2) {
+                    return s1.compareToIgnoreCase(s2);
+                }
+            });
 
             recentConversationArrayList = new ArrayList<>();
             listedMessageIds = new ArrayList<>();
 
-            for(final String contactUsername: usersInContact){
-
+            for(final String contactUsername: inContactArrayList){
                 List<String> conversationPartiesList = Arrays.asList(currentUser.getUsername(), contactUsername);
 
                 ParseQuery<ParseObject> conversationQuery = ParseQuery.getQuery("Message");
@@ -135,8 +158,15 @@ public class WhatsAppActivity extends AppCompatActivity implements View.OnClickL
 
                                 recentConversationAdapter = new RecentConversationAdapter(WhatsAppActivity.this, recentConversationArrayList);
                                 listView.setAdapter(recentConversationAdapter);
-                                Log.i("APPTAG", objects.get(0).getString("message"));
+                                listView.setOnItemClickListener(WhatsAppActivity.this);
                             } else {
+                                // sort ArrayList so conversations are listed alphabetically dependent on conversationOpponent
+                                Collections.sort(recentConversationArrayList, new Comparator<RecentConversation>() {
+                                    @Override
+                                    public int compare(RecentConversation rc1, RecentConversation rc2) {
+                                        return rc1.getConversationOpponent().compareToIgnoreCase(rc2.getConversationOpponent());
+                                    }
+                                });
                                 recentConversationAdapter.notifyDataSetChanged();
                             }
 
@@ -160,6 +190,7 @@ public class WhatsAppActivity extends AppCompatActivity implements View.OnClickL
 
 
     }
+
     private void transitionToUserDirectoryActivity(){
         startActivity(new Intent(WhatsAppActivity.this, UserDirectoryActivity.class));
         finish();
