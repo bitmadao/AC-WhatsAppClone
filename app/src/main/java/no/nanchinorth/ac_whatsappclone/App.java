@@ -3,6 +3,7 @@ package no.nanchinorth.ac_whatsappclone;
 import android.app.Application;
 
 import com.parse.Parse;
+import com.parse.ParseInstallation;
 
 
 public class App extends Application {
@@ -16,5 +17,7 @@ public class App extends Application {
                 .server(getString(R.string.back4app_server_url))
                 .build()
         );
+
+        ParseInstallation.getCurrentInstallation().saveInBackground();
     }
 }
