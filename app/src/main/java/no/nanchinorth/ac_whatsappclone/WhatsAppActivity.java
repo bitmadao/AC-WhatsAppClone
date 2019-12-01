@@ -20,6 +20,7 @@ import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -28,6 +29,10 @@ import static no.nanchinorth.ac_whatsappclone.ACWACHelperTools.logoutParseUser;
 public class WhatsAppActivity extends AppCompatActivity implements View.OnClickListener, SwipeRefreshLayout.OnRefreshListener {
 
     private boolean isListViewPopulated;
+    private ArrayList<String> listedMessageIds;
+
+    private ArrayList<RecentConversation> recentConversationArrayList;
+    private RecentConversationAdapter recentConversationAdapter;
 
     private SwipeRefreshLayout swipeRefreshLayout;
 
@@ -103,8 +108,10 @@ public class WhatsAppActivity extends AppCompatActivity implements View.OnClickL
         if(currentUser.getList("inContact") != null){
             List<String> usersInContact = currentUser.getList("inContact");
 
+            recentConversationArrayList = new ArrayList<>();
+            listedMessageIds = new ArrayList<>();
 
-            for(String contactUsername: usersInContact){
+            for(final String contactUsername: usersInContact){
 
                 List<String> conversationPartiesList = Arrays.asList(currentUser.getUsername(), contactUsername);
 
@@ -118,7 +125,20 @@ public class WhatsAppActivity extends AppCompatActivity implements View.OnClickL
                     @Override
                     public void done(List<ParseObject> objects, ParseException e) {
                         if(objects.size() > 0){
-                            Log.i("APPTAG", objects.get(0).getString("message"));
+                            ParseObject messageObject = objects.get(0);
+                            listedMessageIds.add(messageObject.getObjectId());
+                            recentConversationArrayList.add(new RecentConversation(currentUser.getUsername(), contactUsername, messageObject));
+
+
+                            if(!isListViewPopulated) {
+                                isListViewPopulated = true;
+
+                                recentConversationAdapter = new RecentConversationAdapter(WhatsAppActivity.this, recentConversationArrayList);
+                                listView.setAdapter(recentConversationAdapter);
+                                Log.i("APPTAG", objects.get(0).getString("message"));
+                            } else {
+                                recentConversationAdapter.notifyDataSetChanged();
+                            }
 
                         }
 
