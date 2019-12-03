@@ -14,6 +14,8 @@ public class ConversationMessage {
         if(messageObject.getString("sender").equals(messageSender)){
             this.messageSender = "You";
 
+        }else {
+            this.messageSender = messageObject.getString("sender");
         }
 
         this.message = messageObject.getString("message");
