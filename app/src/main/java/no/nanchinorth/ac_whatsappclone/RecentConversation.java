@@ -17,7 +17,7 @@ public class RecentConversation {
         StringBuilder stringBuilder = new StringBuilder();
 
         if(messageObject.getString("sender").equals(currentUser)){
-            stringBuilder.append("You: ");
+            stringBuilder.append("You: "); // todo strings.xml
         } else {
             stringBuilder.append(messageObject.getString("sender")).append(": ");
         }

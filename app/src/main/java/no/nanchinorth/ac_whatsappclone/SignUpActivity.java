@@ -148,7 +148,7 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
                 if(e == null){
                     FancyToast.makeText(
                             SignUpActivity.this,
-                            String.format("%s signed up successfully!",username),
+                            String.format("%s signed up successfully!",username), //todo strings.xml
                             FancyToast.LENGTH_LONG,
                             FancyToast.SUCCESS,
                             true

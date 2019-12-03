@@ -51,7 +51,7 @@ public class ConversationActivity extends AppCompatActivity implements View.OnCl
         if(ParseUser.getCurrentUser() != null && getIntent().getStringExtra("oppositeUsername") != null){
             currentUser = ParseUser.getCurrentUser();
             oppositeUsername = getIntent().getStringExtra("oppositeUsername");
-            setTitle(String.format("Conversation with %s", oppositeUsername));
+            setTitle(String.format("Conversation with %s", oppositeUsername)); // todo strings.xml
 
         }else if (ParseUser.getCurrentUser() != null) {
             startActivity(new Intent(ConversationActivity.this, WhatsAppActivity.class));
@@ -85,7 +85,7 @@ public class ConversationActivity extends AppCompatActivity implements View.OnCl
     private void btnSendTapped(){
         if(edtMessage.getText().toString().isEmpty() || edtMessage.getText().toString().trim().length() <= 3){
             FancyToast.makeText(ConversationActivity.this,
-                    "Message must be longer than 3 non-whitespace characters",
+                    "Message must be longer than 3 non-whitespace characters", //todo strings.xml
                     FancyToast.LENGTH_SHORT,
                     FancyToast.INFO,
                     true)
@@ -144,7 +144,7 @@ public class ConversationActivity extends AppCompatActivity implements View.OnCl
                         conversationObjectIdsArrayList = new ArrayList<>();
                         for (ParseObject object : objects) {
                             conversationHistoryArrayList.add(String.format(
-                                    "%s says:\n %s",
+                                    "%s says:\n %s", //todo strings.xml
                                     object.getString("sender"),
                                     object.getString("message")));
                             conversationObjectIdsArrayList.add(object.getObjectId());
@@ -162,7 +162,7 @@ public class ConversationActivity extends AppCompatActivity implements View.OnCl
                     } else {
 
                         ArrayAdapter<String> dummyAdapter = new ArrayAdapter<>(ConversationActivity.this,android.R.layout.simple_list_item_1,
-                                new String[]{(String.format("No conversation history with %s yet.",oppositeUsername))});
+                                new String[]{(String.format("No conversation history with %s yet.",oppositeUsername))}); //todo strings.xml
                         listViewMessages.setAdapter(dummyAdapter);
                     }
                 } else {
@@ -186,7 +186,7 @@ public class ConversationActivity extends AppCompatActivity implements View.OnCl
                     if(objects.size() > 0){
                         for(ParseObject object : objects){
                             conversationHistoryArrayList.add(String.format(
-                                    "%s says:\n %s",
+                                    "%s says:\n %s", // todo strings.xml
                                     object.getString("sender"),
                                     object.getString("message")));
                             conversationObjectIdsArrayList.add(object.getObjectId());

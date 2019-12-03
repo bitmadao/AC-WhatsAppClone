@@ -49,7 +49,7 @@ public class UserDirectoryActivity extends AppCompatActivity implements SwipeRef
 
         if(ParseUser.getCurrentUser() != null){
             currentUser = ParseUser.getCurrentUser();
-            setTitle("User Directory");
+            setTitle("User Directory"); // todo strings.xml
         } else {
             transitionToLogin();
         }
@@ -118,7 +118,7 @@ public class UserDirectoryActivity extends AppCompatActivity implements SwipeRef
                         listView.setAdapter(
                                 new ArrayAdapter<>(UserDirectoryActivity.this,
                                         android.R.layout.simple_list_item_1,
-                                        new String[]{"No users yet..."})
+                                        new String[]{"No users yet..."}) //todo strings.xml
                         );
                     }
                 } else {
@@ -153,7 +153,7 @@ public class UserDirectoryActivity extends AppCompatActivity implements SwipeRef
                     } else {
                         FancyToast.makeText(
                                 UserDirectoryActivity.this,
-                                "User Directory is up-to-date",
+                                "User Directory is up-to-date", //todo strings.xml
                                 FancyToast.LENGTH_SHORT,
                                 FancyToast.INFO,
                                 true)

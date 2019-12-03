@@ -91,12 +91,12 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
         if (edtUsername.getText().toString().isEmpty()) {
             objection = true;
-            stringBuilder.append("No username?\n");
+            stringBuilder.append("No username?\n"); // todo strings.xml
         }
 
         if (edtPassword.getText().toString().isEmpty()) {
             objection = true;
-            stringBuilder.append("No password?");
+            stringBuilder.append("No password?"); //todo strings.xml
         }
 
         if (objection) {
@@ -113,7 +113,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                 if(e == null) {
                     transitionToWhatsAppActivity();
                 } else if (e.getMessage().equals("Invalid username/password.")){
-                    Toast.makeText(LoginActivity.this, "Can't find that user/password-combo", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(LoginActivity.this, "Can't find that user/password-combo", Toast.LENGTH_SHORT).show();// todo strings.xml
                 } else {
                     logAndFancyToastException(LoginActivity.this, e);
                 }
