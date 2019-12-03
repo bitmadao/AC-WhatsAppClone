@@ -2,7 +2,6 @@ package no.nanchinorth.ac_whatsappclone;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
@@ -18,6 +17,7 @@ import com.parse.SignUpCallback;
 import com.shashank.sony.fancytoastlib.FancyToast;
 
 import static no.nanchinorth.ac_whatsappclone.ACWACHelperTools.hideSoftKeyboard;
+import static no.nanchinorth.ac_whatsappclone.ACWACHelperTools.logAndFancyToastException;
 
 public class SignUpActivity extends AppCompatActivity implements View.OnClickListener, View.OnKeyListener, View.OnTouchListener {
 
@@ -155,14 +155,7 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
                     ).show();
                     transitionToWhatsAppActivity();
                 } else {
-                    Log.i("APPTAG", e.getMessage());
-                    FancyToast.makeText(
-                            SignUpActivity.this,
-                            getString(R.string.toast_generic_error),
-                            FancyToast.LENGTH_LONG,
-                            FancyToast.ERROR,
-                            true
-                    ).show();
+                    logAndFancyToastException(SignUpActivity.this, e);
                 }
             }
         });

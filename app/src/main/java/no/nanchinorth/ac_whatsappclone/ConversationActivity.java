@@ -165,6 +165,8 @@ public class ConversationActivity extends AppCompatActivity implements View.OnCl
                                 new String[]{(String.format("No conversation history with %s yet.",oppositeUsername))});
                         listViewMessages.setAdapter(dummyAdapter);
                     }
+                } else {
+                    logAndFancyToastException(ConversationActivity.this, e);
                 }
             }
         });

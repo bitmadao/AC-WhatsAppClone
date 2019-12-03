@@ -2,7 +2,6 @@ package no.nanchinorth.ac_whatsappclone;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -25,6 +24,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+
+import static no.nanchinorth.ac_whatsappclone.ACWACHelperTools.logAndFancyToastException;
 
 public class UserDirectoryActivity extends AppCompatActivity implements SwipeRefreshLayout.OnRefreshListener, AdapterView.OnItemClickListener {
 
@@ -121,12 +122,7 @@ public class UserDirectoryActivity extends AppCompatActivity implements SwipeRef
                         );
                     }
                 } else {
-                    Log.i("APPTAG", e.getMessage());
-                    FancyToast.makeText(
-                            UserDirectoryActivity.this,
-                            getString(R.string.toast_generic_error),
-                            FancyToast.LENGTH_LONG,FancyToast.ERROR,true)
-                        .show();
+                    logAndFancyToastException(UserDirectoryActivity.this, e);
                 }
             }
         });
@@ -163,6 +159,8 @@ public class UserDirectoryActivity extends AppCompatActivity implements SwipeRef
                                 true)
                             .show();
                     }
+                } else {
+                    logAndFancyToastException(UserDirectoryActivity.this, e);
                 }
             }
         });

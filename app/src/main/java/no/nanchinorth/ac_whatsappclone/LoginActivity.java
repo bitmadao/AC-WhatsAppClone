@@ -2,7 +2,6 @@ package no.nanchinorth.ac_whatsappclone;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
@@ -18,6 +17,7 @@ import com.parse.ParseException;
 import com.parse.ParseUser;
 
 import static no.nanchinorth.ac_whatsappclone.ACWACHelperTools.hideSoftKeyboard;
+import static no.nanchinorth.ac_whatsappclone.ACWACHelperTools.logAndFancyToastException;
 
 public class LoginActivity extends AppCompatActivity implements View.OnClickListener, View.OnKeyListener, View.OnTouchListener {
 
@@ -45,7 +45,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         btnNeedAccount = findViewById(R.id.btnLoginActivityNeedAccount);
 
 
-        constraintLayout.setOnTouchListener(LoginActivity.this);
+        constraintLayout.setOnTouchListener(LoginActivity.this); //TODO Accessibility
         edtPassword.setOnKeyListener(LoginActivity.this);
         btnLogin.setOnClickListener(LoginActivity.this);
         btnNeedAccount.setOnClickListener(LoginActivity.this);
@@ -115,7 +115,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                 } else if (e.getMessage().equals("Invalid username/password.")){
                     Toast.makeText(LoginActivity.this, "Can't find that user/password-combo", Toast.LENGTH_SHORT).show();
                 } else {
-                    Log.i("APPTAG", e.getMessage());
+                    logAndFancyToastException(LoginActivity.this, e);
                 }
             }
         });
