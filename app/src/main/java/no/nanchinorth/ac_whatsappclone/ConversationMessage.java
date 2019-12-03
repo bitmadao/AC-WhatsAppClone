@@ -9,12 +9,13 @@ public class ConversationMessage {
     private String message;
     private Date messageDate;
 
-    public ConversationMessage(String messageSender, ParseObject messageObject){
+    public ConversationMessage(String currentUsername, ParseObject messageObject){
 
-        if(messageObject.getString("sender").equals(messageSender)){
+        if(messageObject.getString("sender").equals(currentUsername)){
             this.messageSender = "You";
 
         }else {
+            
             this.messageSender = messageObject.getString("sender");
         }
 

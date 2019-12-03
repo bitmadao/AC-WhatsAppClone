@@ -38,6 +38,9 @@ public class ConversationActivity extends AppCompatActivity implements View.OnCl
     private ArrayList<String> conversationObjectIdsArrayList;
     private ArrayAdapter<String> conversationHistoryArrayAdapter;
 
+    private ArrayList<ConversationMessage>  conversationMessageArrayList;
+    private ConversationMessageAdapter conversationMessageAdapter;
+
     private ParseUser currentUser;
     private String oppositeUsername;
 
@@ -139,17 +142,23 @@ public class ConversationActivity extends AppCompatActivity implements View.OnCl
             public void done(List<ParseObject> objects, ParseException e) {
                 if(e == null){
                     if(objects.size() > 0) {
+
                         isConversationHistoryArrayListPopulated = true;
                         conversationHistoryArrayList = new ArrayList<>();
+                        conversationMessageArrayList = new ArrayList<>();
                         conversationObjectIdsArrayList = new ArrayList<>();
                         for (ParseObject object : objects) {
+                            conversationMessageArrayList.add(new ConversationMessage(currentUser.getUsername(),object));
+/*
                             conversationHistoryArrayList.add(String.format(
                                     "%s says:\n %s", //todo strings.xml
                                     object.getString("sender"),
                                     object.getString("message")));
                             conversationObjectIdsArrayList.add(object.getObjectId());
-                        }
 
+ */
+                        }
+/*
                         conversationHistoryArrayAdapter =
                                 new ArrayAdapter<>(
                                         ConversationActivity.this,
@@ -158,6 +167,10 @@ public class ConversationActivity extends AppCompatActivity implements View.OnCl
                                 );
 
                         listViewMessages.setAdapter(conversationHistoryArrayAdapter);
+
+ */
+                        conversationMessageAdapter = new ConversationMessageAdapter(ConversationActivity.this,conversationMessageArrayList);
+                        listViewMessages.setAdapter(conversationMessageAdapter);
 
                     } else {
 
@@ -185,14 +198,19 @@ public class ConversationActivity extends AppCompatActivity implements View.OnCl
                 if(e == null){
                     if(objects.size() > 0){
                         for(ParseObject object : objects){
+/*
                             conversationHistoryArrayList.add(String.format(
                                     "%s says:\n %s", // todo strings.xml
                                     object.getString("sender"),
                                     object.getString("message")));
+
+ */
+                            conversationMessageArrayList.add(new ConversationMessage(currentUser.getUsername(), object));
                             conversationObjectIdsArrayList.add(object.getObjectId());
                         }
 
-                        conversationHistoryArrayAdapter.notifyDataSetChanged();
+                        conversationMessageAdapter.notifyDataSetChanged();
+//                        conversationHistoryArrayAdapter.notifyDataSetChanged();
                     }
                 } else {
                     logAndFancyToastException(ConversationActivity.this, e);

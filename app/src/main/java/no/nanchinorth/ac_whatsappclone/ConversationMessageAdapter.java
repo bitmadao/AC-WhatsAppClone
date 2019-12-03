@@ -28,7 +28,7 @@ public class ConversationMessageAdapter extends ArrayAdapter<ConversationMessage
     public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
         ConversationMessage conversationMessage = getItem(position);
 
-        if(convertView != null){
+        if(convertView == null){
             convertView = LayoutInflater.from(context).inflate(R.layout.item_conversation_message, parent, false);
         }
 
@@ -36,7 +36,7 @@ public class ConversationMessageAdapter extends ArrayAdapter<ConversationMessage
         TextView txtDateTime = convertView.findViewById(R.id.txtItemConversationMessageDateTime);
         TextView txtMessage = convertView.findViewById(R.id.txtItemConversationMessageMessage);
 
-        txtSender.setText(conversationMessage.getMessage());
+        txtSender.setText(conversationMessage.getMessageSender());
         txtDateTime.setText(conversationMessage.getMessageDate().toString());
         txtMessage.setText(conversationMessage.getMessage());
 
