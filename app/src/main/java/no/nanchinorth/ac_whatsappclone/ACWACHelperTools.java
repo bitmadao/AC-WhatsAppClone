@@ -23,14 +23,7 @@ public class ACWACHelperTools {
             InputMethodManager inputMethodManager = (InputMethodManager) context.getSystemService(INPUT_METHOD_SERVICE);
             inputMethodManager.hideSoftInputFromWindow(activityLayout.getWindowToken(), 0);
         } catch(Exception e) {
-            Log.i("APPTAG",e.getMessage());
-            FancyToast.makeText(
-                    context,
-                    context.getString(R.string.toast_generic_error),
-                    FancyToast.LENGTH_LONG,
-                    FancyToast.ERROR,
-                    true)
-                    .show();
+            logAndFancyToastException(context, e);
         }
 
     }
