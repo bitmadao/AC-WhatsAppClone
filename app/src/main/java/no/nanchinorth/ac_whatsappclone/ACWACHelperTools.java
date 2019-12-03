@@ -15,9 +15,9 @@ import com.shashank.sony.fancytoastlib.FancyToast;
 
 import static android.content.Context.INPUT_METHOD_SERVICE;
 
-public class ACWACHelperTools {
+class ACWACHelperTools {
 
-    public static void hideSoftKeyboard(Context context, View activityLayout) {
+    static void hideSoftKeyboard(Context context, View activityLayout) {
 
         try {
             InputMethodManager inputMethodManager = (InputMethodManager) context.getSystemService(INPUT_METHOD_SERVICE);
@@ -28,7 +28,7 @@ public class ACWACHelperTools {
 
     }
 
-    public static void logoutParseUser(final Context context, final AppCompatActivity activity){
+    static void logoutParseUser(final Context context, final AppCompatActivity activity){
         ParseUser.logOutInBackground(new LogOutCallback() {
             @Override
             public void done(ParseException e) {
@@ -43,7 +43,7 @@ public class ACWACHelperTools {
         });
     }
 
-    public static void logAndFancyToastException(Context context, Exception e){
+    static void logAndFancyToastException(Context context, Exception e){
         Log.i("APPTAG", e.getMessage());
         FancyToast.makeText(
                 context,
