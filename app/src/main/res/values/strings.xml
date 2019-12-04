@@ -8,4 +8,9 @@
 
     <string name="toast_generic_error">OOps!\nSomething went wrong!</string>
 
+    <!-- ConversationActivity -->
+    <string name="title_activity_conversation">Conversation with %s</string>
+    <string name="toast_activity_conversation_message_req">Message must be longer than 3 non-whitespace characters</string>
+    <string name="activity_conversation_no_history">No conversation history with %s yet.</string>
+
 </resources>
