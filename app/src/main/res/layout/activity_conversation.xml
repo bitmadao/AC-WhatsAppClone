@@ -1,35 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ConversationActivity">
+    tools:context=".ConversationActivity"
+    android:orientation="vertical">
 
-    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-        android:id="@+id/swipeRefreshLayoutConversationActivity"
-        android:layout_width="wrap_content"
+    <ListView
+        android:id="@+id/listViewConversationActivity"
+        android:layout_width="match_parent"
         android:layout_height="0dp"
-        app:layout_constraintBottom_toTopOf="@id/linearLayoutHorizontalConversationActivityInput"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
-
-        <ListView
-            android:id="@+id/listViewConversationActivity"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:stackFromBottom="true" />
-    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+        android:layout_weight="5"
+        android:stackFromBottom="true" />
 
     <LinearLayout
         android:id="@+id/linearLayoutHorizontalConversationActivityInput"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent">
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:orientation="horizontal">
 
         <EditText
             android:id="@+id/edtConversationActivityMessage"
@@ -40,6 +29,8 @@
             android:layout_weight="3"
             android:ems="10"
             android:gravity="start|top"
+            android:hint="Your message goes here"
+            android:importantForAutofill="no"
             android:inputType="textMultiLine" />
 
         <Button
@@ -50,4 +41,4 @@
             android:layout_weight="1"
             android:text="Send" />
     </LinearLayout>
-</androidx.constraintlayout.widget.ConstraintLayout>
+</LinearLayout>

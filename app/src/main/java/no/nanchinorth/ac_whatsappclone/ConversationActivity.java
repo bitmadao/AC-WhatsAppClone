@@ -9,7 +9,6 @@ import android.widget.EditText;
 import android.widget.ListView;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.parse.FindCallback;
 import com.parse.ParseException;
@@ -27,7 +26,6 @@ import static no.nanchinorth.ac_whatsappclone.ACWACHelperTools.logAndFancyToastE
 
 public class ConversationActivity extends AppCompatActivity implements View.OnClickListener {
 
-    private SwipeRefreshLayout swipeRefreshLayoutMessages;
     private ListView listViewMessages;
 
     private EditText edtMessage;
@@ -134,6 +132,7 @@ public class ConversationActivity extends AppCompatActivity implements View.OnCl
         ParseQuery<ParseObject> parseQuery = ParseQuery.getQuery("Message");
         parseQuery.whereContainedIn("sender", Arrays.asList(conversationPartiesArray));
         parseQuery.whereContainedIn("receiver",Arrays.asList(conversationPartiesArray));
+        parseQuery.orderByAscending("createdAt");
 
         parseQuery.findInBackground(new FindCallback<ParseObject>() {
             @Override
@@ -146,6 +145,7 @@ public class ConversationActivity extends AppCompatActivity implements View.OnCl
                         conversationObjectIdsArrayList = new ArrayList<>();
                         for (ParseObject object : objects) {
                             conversationMessageArrayList.add(new ConversationMessage(currentUser.getUsername(),object));
+                            conversationObjectIdsArrayList.add(object.getObjectId());
 
                         }
 
@@ -170,7 +170,8 @@ public class ConversationActivity extends AppCompatActivity implements View.OnCl
         ParseQuery<ParseObject> parseQuery = ParseQuery.getQuery("Message");
         parseQuery.whereContainedIn("sender",Arrays.asList(conversationPartiesArray));
         parseQuery.whereContainedIn("receiver",Arrays.asList(conversationPartiesArray));
-        parseQuery.whereNotContainedIn("objectId",conversationObjectIdsArrayList);
+        parseQuery.whereNotContainedIn("objectId",(List<String>)conversationObjectIdsArrayList);
+        parseQuery.orderByAscending("createdAt");
 
         parseQuery.findInBackground(new FindCallback<ParseObject>() {
             @Override
