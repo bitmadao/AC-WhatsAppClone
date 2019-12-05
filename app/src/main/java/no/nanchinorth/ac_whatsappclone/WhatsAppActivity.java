@@ -57,7 +57,7 @@ public class WhatsAppActivity extends AppCompatActivity implements
         if(ParseUser.getCurrentUser() != null){
             currentUser = ParseUser.getCurrentUser();
             inContactArrayList = new ArrayList<>();
-            setTitle(String.format("Conversations: %s", currentUser.getUsername())); //todo strings.xml
+            setTitle(String.format(getString(R.string.title_activity_whatsapp), currentUser.getUsername()));
         } else {
             transitionToLogin();
         }
@@ -246,7 +246,7 @@ public class WhatsAppActivity extends AppCompatActivity implements
                                 }
                             }
 
-                            currentUser.addAll("inContact",newContactsList);
+                            currentUser.addAll("inContact", newContactsList);
                             currentUser.saveInBackground(new SaveCallback() {
                                 @Override
                                 public void done(ParseException e) {
@@ -262,7 +262,7 @@ public class WhatsAppActivity extends AppCompatActivity implements
                 }
             });
 
-            String[] noConversations = {"No conversations yet"}; //todo strings.xml
+            String[] noConversations = {getString(R.string.listview_placeholder_activity_whatsapp)};
             ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(
                     WhatsAppActivity.this,
                     android.R.layout.simple_list_item_1,

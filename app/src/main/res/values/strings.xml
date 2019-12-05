@@ -13,4 +13,8 @@
     <string name="toast_activity_conversation_message_req">Message must be longer than 3 non-whitespace characters</string>
     <string name="activity_conversation_no_history">No conversation history with %s yet.</string>
 
+    <!-- WhatsAppActivity -->
+    <string name="title_activity_whatsapp">Conversations: %s</string>
+    <string name="listview_placeholder_activity_whatsapp">No conversations yet</string>
+
 </resources>
