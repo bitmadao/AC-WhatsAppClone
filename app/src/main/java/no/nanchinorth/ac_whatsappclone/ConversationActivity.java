@@ -2,6 +2,9 @@ package no.nanchinorth.ac_whatsappclone;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
+import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -16,10 +19,15 @@ import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
 import com.parse.SaveCallback;
+import com.parse.livequery.ParseLiveQueryClient;
+import com.parse.livequery.SubscriptionHandling;
 import com.shashank.sony.fancytoastlib.FancyToast;
 
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import static no.nanchinorth.ac_whatsappclone.ACWACHelperTools.logAndFancyToastException;
@@ -39,6 +47,7 @@ public class ConversationActivity extends AppCompatActivity implements View.OnCl
 
     private ParseUser currentUser;
     private String oppositeUsername;
+    private ParseLiveQueryClient parseLiveQueryClient ;
 
     private String[] conversationPartiesArray;
 
@@ -61,6 +70,15 @@ public class ConversationActivity extends AppCompatActivity implements View.OnCl
             finish();
         }
 
+        parseLiveQueryClient = null;
+
+        try {
+            parseLiveQueryClient = ParseLiveQueryClient.Factory.getClient(new URI(getString(R.string.back4app_server_url_wss)));
+        } catch (Exception e) {
+            Log.i("APPTAG", e.getMessage());
+        }
+
+
         listViewMessages = findViewById(R.id.listViewConversationActivity);
 
         isConversationHistoryArrayListPopulated = false;
@@ -72,6 +90,8 @@ public class ConversationActivity extends AppCompatActivity implements View.OnCl
         conversationPartiesArray = new String[]{currentUser.getUsername(), oppositeUsername};
 
         populateMessagesListView();
+
+        queryForNewMessages();
     }
 
     @Override
@@ -183,6 +203,7 @@ public class ConversationActivity extends AppCompatActivity implements View.OnCl
                             conversationObjectIdsArrayList.add(object.getObjectId());
                         }
 
+                        sortConversationArrayList();
                         conversationMessageAdapter.notifyDataSetChanged();
                     }
                 } else {
@@ -191,5 +212,54 @@ public class ConversationActivity extends AppCompatActivity implements View.OnCl
             }
         });
 
+    }
+
+    private void queryForNewMessages(){
+        if(parseLiveQueryClient != null){
+            ParseQuery<ParseObject> parseQuery = new ParseQuery("Message");
+            parseQuery.whereEqualTo("sender", oppositeUsername);
+            parseQuery.whereEqualTo("receiver", currentUser.getUsername());
+
+            SubscriptionHandling<ParseObject> subscriptionHandling = parseLiveQueryClient.subscribe(parseQuery);
+
+            subscriptionHandling.handleEvent(SubscriptionHandling.Event.CREATE, new SubscriptionHandling.HandleEventCallback<ParseObject>() {
+                @Override
+                public void onEvent(ParseQuery<ParseObject> query, final ParseObject object) {
+
+
+                    Handler handler = new Handler(Looper.getMainLooper());
+                    handler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            liveUpdateFromOpponent(object);
+                        }
+                    });
+
+
+                }
+            });
+        }
+    }
+
+    private void liveUpdateFromOpponent(ParseObject messageObject){
+        if(isConversationHistoryArrayListPopulated) {
+
+            conversationMessageArrayList.add(new ConversationMessage(currentUser.getUsername(), messageObject));
+            sortConversationArrayList();
+            conversationObjectIdsArrayList.add(messageObject.getObjectId());
+            conversationMessageAdapter.notifyDataSetChanged();
+
+        } else {
+            populateMessagesListView();
+        }
+    }
+
+    private void sortConversationArrayList(){
+        Collections.sort(conversationMessageArrayList, new Comparator<ConversationMessage>() {
+            @Override
+            public int compare(ConversationMessage o1, ConversationMessage o2) {
+                return o1.getMessageDate().compareTo(o2.getMessageDate());
+            }
+        });
     }
 }
