@@ -34,9 +34,7 @@ public class ConversationActivity extends AppCompatActivity implements View.OnCl
     private Button btnSend;
 
     private boolean isConversationHistoryArrayListPopulated;
-    private ArrayList<String> conversationHistoryArrayList;
     private ArrayList<String> conversationObjectIdsArrayList;
-    private ArrayAdapter<String> conversationHistoryArrayAdapter;
 
     private ArrayList<ConversationMessage>  conversationMessageArrayList;
     private ConversationMessageAdapter conversationMessageAdapter;
@@ -144,7 +142,6 @@ public class ConversationActivity extends AppCompatActivity implements View.OnCl
                     if(objects.size() > 0) {
 
                         isConversationHistoryArrayListPopulated = true;
-                        conversationHistoryArrayList = new ArrayList<>();
                         conversationMessageArrayList = new ArrayList<>();
                         conversationObjectIdsArrayList = new ArrayList<>();
                         for (ParseObject object : objects) {
@@ -186,7 +183,6 @@ public class ConversationActivity extends AppCompatActivity implements View.OnCl
                         }
 
                         conversationMessageAdapter.notifyDataSetChanged();
-//                        conversationHistoryArrayAdapter.notifyDataSetChanged();
                     }
                 } else {
                     logAndFancyToastException(ConversationActivity.this, e);
