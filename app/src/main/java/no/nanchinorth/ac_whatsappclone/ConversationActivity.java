@@ -124,9 +124,12 @@ public class ConversationActivity extends AppCompatActivity implements View.OnCl
                 if(e == null) {
 
                     if(isConversationHistoryArrayListPopulated){
+                        Log.i("APPTAG", "btnSend: boolean is true");
                         edtMessage.setText("");
                         updateMessagesListView();
                     } else {
+                        Log.i("APPTAG", "btnSend: boolean is false");
+
                         currentUser.add("inContact", oppositeUsername);
                         currentUser.saveInBackground(new SaveCallback() {
                             @Override
@@ -159,6 +162,7 @@ public class ConversationActivity extends AppCompatActivity implements View.OnCl
             public void done(List<ParseObject> objects, ParseException e) {
                 if(e == null){
                     if(objects.size() > 0) {
+                        Log.i("APPTAG", "populateMessages: objects.size() is " + objects.size());
 
                         isConversationHistoryArrayListPopulated = true;
                         conversationMessageArrayList = new ArrayList<>();
@@ -198,6 +202,8 @@ public class ConversationActivity extends AppCompatActivity implements View.OnCl
             public void done(List<ParseObject> objects, ParseException e) {
                 if(e == null){
                     if(objects.size() > 0){
+                        Log.i("APPTAG", "updateMessages: objects.size() is " + objects.size());
+
                         for(ParseObject object : objects){
                             conversationMessageArrayList.add(new ConversationMessage(currentUser.getUsername(), object));
                             conversationObjectIdsArrayList.add(object.getObjectId());
