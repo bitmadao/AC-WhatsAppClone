@@ -2,6 +2,7 @@ package no.nanchinorth.ac_whatsappclone;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -25,7 +26,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.TreeMap;
 
 import static no.nanchinorth.ac_whatsappclone.ACWACHelperTools.logAndFancyToastException;
 import static no.nanchinorth.ac_whatsappclone.ACWACHelperTools.logoutParseUser;
@@ -36,12 +40,12 @@ public class WhatsAppActivity extends AppCompatActivity implements
         AdapterView.OnItemClickListener {
 
     private boolean isListViewPopulated;
-    private ArrayList<String> listedMessageIds;
 
-    ArrayList<String> inContactArrayList;
+    private ArrayList<String> inContactArrayList;
 
-    private ArrayList<RecentConversation> recentConversationArrayList;
-    private RecentConversationAdapter recentConversationAdapter;
+    private TreeMap<String, RecentConversation> recentConversationTreeMap;
+    private HashMap<String, Date> recentConversationLastMessageDateHashMap;
+    private RecentConversationTreeMapAdapter recentConversationTreeMapAdapter;
 
     private SwipeRefreshLayout swipeRefreshLayout;
 
@@ -104,7 +108,11 @@ public class WhatsAppActivity extends AppCompatActivity implements
 
     @Override
     public void onRefresh() {
-        populateListView();
+        if(isListViewPopulated){
+            updateListView();
+        } else {
+            populateListView();
+        }
         swipeRefreshLayout.setRefreshing(false);
 
     }
@@ -168,12 +176,20 @@ public class WhatsAppActivity extends AppCompatActivity implements
                                         }
                                     });
 
-                                    populateListView();
+                                    if(isListViewPopulated){
+                                        updateListView();
+                                    } else {
+                                        populateListView();
+                                    }
                                 }
                             }
                         });
                     } else {
-                        populateListView();
+                        if(isListViewPopulated){
+                            updateListView();
+                        } else {
+                            populateListView();
+                        }
                     }
                 } else {
                     logAndFancyToastException(WhatsAppActivity.this, e);
@@ -185,8 +201,9 @@ public class WhatsAppActivity extends AppCompatActivity implements
     private void populateListView(){
         if(currentUser.getList("inContact") != null){
 
-            recentConversationArrayList = new ArrayList<>();
-            listedMessageIds = new ArrayList<>();
+            recentConversationTreeMap = new TreeMap<>();
+            recentConversationLastMessageDateHashMap = new HashMap<>();
+
 
             for(final String contactUsername: inContactArrayList){
                 List<String> conversationPartiesList = Arrays.asList(currentUser.getUsername(), contactUsername);
@@ -200,29 +217,34 @@ public class WhatsAppActivity extends AppCompatActivity implements
                 conversationQuery.findInBackground(new FindCallback<ParseObject>() {
                     @Override
                     public void done(List<ParseObject> objects, ParseException e) {
-                        if(objects.size() > 0){
-                            ParseObject messageObject = objects.get(0);
-                            listedMessageIds.add(messageObject.getObjectId());
-                            recentConversationArrayList.add(new RecentConversation(currentUser.getUsername(), contactUsername, messageObject));
-
-
-                            if(!isListViewPopulated) {
+                        if(e == null) {
+                            if (objects.size() > 0) {
                                 isListViewPopulated = true;
 
-                                recentConversationAdapter = new RecentConversationAdapter(WhatsAppActivity.this, recentConversationArrayList);
-                                listView.setAdapter(recentConversationAdapter);
-                                listView.setOnItemClickListener(WhatsAppActivity.this);
-                            } else {
-                                // sort ArrayList so conversations are listed alphabetically dependent on conversationOpponent
-                                Collections.sort(recentConversationArrayList, new Comparator<RecentConversation>() {
-                                    @Override
-                                    public int compare(RecentConversation rc1, RecentConversation rc2) {
-                                        return rc1.getConversationOpponent().compareToIgnoreCase(rc2.getConversationOpponent());
-                                    }
-                                });
-                                recentConversationAdapter.notifyDataSetChanged();
-                            }
+                                ParseObject messageObject = objects.get(0);
 
+                                recentConversationLastMessageDateHashMap.put(contactUsername, messageObject.getCreatedAt());
+                                recentConversationTreeMap.put(
+                                        contactUsername,
+                                        new RecentConversation(
+                                                currentUser.getUsername(),
+                                                contactUsername,
+                                                messageObject
+                                        )
+                                );
+
+
+
+                            }
+                            if(inContactArrayList.indexOf(contactUsername) == (inContactArrayList.size() - 1)) {
+
+                                recentConversationTreeMapAdapter = new RecentConversationTreeMapAdapter(WhatsAppActivity.this, recentConversationTreeMap);
+                                listView.setAdapter(recentConversationTreeMapAdapter);
+
+                                listView.setOnItemClickListener(WhatsAppActivity.this);
+                            }
+                        } else {
+                            logAndFancyToastException(WhatsAppActivity.this, e);
                         }
 
                     }
@@ -273,6 +295,43 @@ public class WhatsAppActivity extends AppCompatActivity implements
 
 
     }
+
+    private void updateListView(){
+        for(final String contactUsername: inContactArrayList) {
+            List<String> conversationPartiesList = Arrays.asList(currentUser.getUsername(), contactUsername);
+
+            ParseQuery<ParseObject> conversationQuery = ParseQuery.getQuery("Message");
+            conversationQuery.whereContainedIn("sender", conversationPartiesList);
+            conversationQuery.whereContainedIn("receiver", conversationPartiesList);
+            conversationQuery.orderByDescending("createdAt");
+            conversationQuery.whereGreaterThan("createdAt", recentConversationLastMessageDateHashMap.get(contactUsername));
+            conversationQuery.setLimit(1);
+
+            conversationQuery.findInBackground(new FindCallback<ParseObject>() {
+                @Override
+                public void done(List<ParseObject> objects, ParseException e) {
+                    if(e == null){
+                        if(objects.size() > 0){
+                            ParseObject messageObject = objects.get(0);
+
+                            recentConversationLastMessageDateHashMap.put(contactUsername, messageObject.getCreatedAt());
+                            recentConversationTreeMap.put(contactUsername, new RecentConversation(currentUser.getUsername(), contactUsername, messageObject));
+
+                        }
+
+                        if(inContactArrayList.indexOf(contactUsername) == (inContactArrayList.size() - 1)){
+                            recentConversationTreeMapAdapter.notifyDataSetChanged();
+                        }
+
+                    } else {
+                        logAndFancyToastException(WhatsAppActivity.this, e);
+                    }
+                }
+            });
+        }
+    }
+
+
 
     private void transitionToUserDirectoryActivity(){
         startActivity(new Intent(WhatsAppActivity.this, UserDirectoryActivity.class));
