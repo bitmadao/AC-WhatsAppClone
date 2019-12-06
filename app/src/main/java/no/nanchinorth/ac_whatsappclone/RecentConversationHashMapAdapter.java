@@ -17,6 +17,7 @@ public class RecentConversationHashMapAdapter extends BaseAdapter {
 
 
     public RecentConversationHashMapAdapter(Context context,HashMap<String, RecentConversation> hashMap){
+        mContext = context;
         mHashMap = hashMap;
         mKeys = mHashMap.keySet().toArray(new String[mHashMap.size()]);
 
