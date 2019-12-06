@@ -7,29 +7,29 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
 
-import java.util.HashMap;
+import java.util.TreeMap;
 
-public class RecentConversationHashMapAdapter extends BaseAdapter {
+public class RecentConversationTreeMapAdapter extends BaseAdapter {
 
-    private HashMap<String, RecentConversation> mHashMap;
+    private TreeMap<String, RecentConversation> mTreeMap;
     private String[] mKeys;
     private Context mContext;
 
 
-    public RecentConversationHashMapAdapter(Context context,HashMap<String, RecentConversation> hashMap){
+    public RecentConversationTreeMapAdapter(Context context, TreeMap<String, RecentConversation> treeMap){
         mContext = context;
-        mHashMap = hashMap;
-        mKeys = mHashMap.keySet().toArray(new String[mHashMap.size()]);
+        mTreeMap = treeMap;
+        mKeys = mTreeMap.keySet().toArray(new String[0]);
 
     }
     @Override
     public int getCount() {
-        return mHashMap.size();
+        return mTreeMap.size();
     }
 
     @Override
     public RecentConversation getItem(int position) {
-        return mHashMap.get(mKeys[position]);
+        return mTreeMap.get(mKeys[position]);
     }
 
     @Override
