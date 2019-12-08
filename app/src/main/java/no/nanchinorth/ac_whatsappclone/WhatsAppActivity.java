@@ -46,7 +46,7 @@ public class WhatsAppActivity extends AppCompatActivity implements
 
     private boolean isListViewPopulated;
 
-    final String currentUserAliasString = getString(R.string.recent_conversation_sb_you);
+    private String currentUserAliasString;
 
     private ArrayList<String> inContactArrayList;
 
@@ -74,6 +74,7 @@ public class WhatsAppActivity extends AppCompatActivity implements
             transitionToLogin();
         }
 
+        currentUserAliasString = getString(R.string.recent_conversation_sb_you);
 
         parseLiveQueryClient = null;
 
