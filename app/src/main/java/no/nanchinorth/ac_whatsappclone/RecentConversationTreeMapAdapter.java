@@ -55,9 +55,9 @@ public class RecentConversationTreeMapAdapter extends BaseAdapter {
         TextView txtLastMessage = convertView.findViewById(R.id.txtItemRecentConversationLatestMessage);
         TextView txtLastMessageDate = convertView.findViewById(R.id.txtItemRecentConversationLastMessageDate);
 
-        txtOpponent.setText(recentConversation.getConversationOpponent());
-        txtLastMessage.setText(recentConversation.getLastMessage());
-        txtLastMessageDate.setText(recentConversation.getLastMessageDate());
+        txtOpponent.setText(recentConversation.getmConversationOpponent());
+        txtLastMessage.setText(recentConversation.getmLastMessage());
+        txtLastMessageDate.setText(recentConversation.getmLastMessageDate());
 
         return convertView;
     }

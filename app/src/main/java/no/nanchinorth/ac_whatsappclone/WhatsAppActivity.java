@@ -46,6 +46,8 @@ public class WhatsAppActivity extends AppCompatActivity implements
 
     private boolean isListViewPopulated;
 
+    final String currentUserAliasString = getString(R.string.recent_conversation_sb_you);
+
     private ArrayList<String> inContactArrayList;
 
     private TreeMap<String, RecentConversation> recentConversationTreeMap;
@@ -182,7 +184,8 @@ public class WhatsAppActivity extends AppCompatActivity implements
                                         new RecentConversation(
                                                 currentUser.getUsername(),
                                                 messageObject.getString("sender"),
-                                                messageObject
+                                                messageObject,
+                                                currentUserAliasString
                                         )
                                 );
 
@@ -301,7 +304,8 @@ public class WhatsAppActivity extends AppCompatActivity implements
                                         new RecentConversation(
                                                 currentUser.getUsername(),
                                                 contactUsername,
-                                                messageObject
+                                                messageObject,
+                                                currentUserAliasString
                                         )
                                 );
 
@@ -399,7 +403,8 @@ public class WhatsAppActivity extends AppCompatActivity implements
                             ParseObject messageObject = objects.get(0);
 
                             recentConversationLastMessageDateHashMap.put(contactUsername, messageObject.getCreatedAt());
-                            recentConversationTreeMap.put(contactUsername, new RecentConversation(currentUser.getUsername(), contactUsername, messageObject));
+                            recentConversationTreeMap.put(contactUsername,
+                                    new RecentConversation(currentUser.getUsername(), contactUsername, messageObject, currentUserAliasString));
 
                         }
 

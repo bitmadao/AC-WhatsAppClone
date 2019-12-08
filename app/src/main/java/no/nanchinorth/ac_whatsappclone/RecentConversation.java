@@ -8,16 +8,16 @@ import java.util.Locale;
 
 public class RecentConversation {
 
-    private String conversationOpponent;
-    private String lastMessage;
-    private Date lastMessageDate;
+    private String mConversationOpponent;
+    private String mLastMessage;
+    private Date mLastMessageDate;
 
-    public RecentConversation(String currentUser, String contactUsername, ParseObject messageObject){
-        this.conversationOpponent = contactUsername;
+    public RecentConversation(String currentUser, String contactUsername, ParseObject messageObject, String currentUserAlias){
+        this.mConversationOpponent = contactUsername;
         StringBuilder stringBuilder = new StringBuilder();
 
         if(messageObject.getString("sender").equals(currentUser)){
-            stringBuilder.append("You: "); // todo strings.xml
+            stringBuilder.append(currentUserAlias);
         } else {
             stringBuilder.append(messageObject.getString("sender")).append(": ");
         }
@@ -28,22 +28,22 @@ public class RecentConversation {
             stringBuilder.append(messageObject.getString("message"));
         }
 
-        this.lastMessage = stringBuilder.toString();
+        this.mLastMessage = stringBuilder.toString();
 
-        this.lastMessageDate = messageObject.getCreatedAt();
+        this.mLastMessageDate = messageObject.getCreatedAt();
 
     }
 
-    public String getConversationOpponent() {
-        return conversationOpponent;
+    public String getmConversationOpponent() {
+        return mConversationOpponent;
     }
 
-    public String getLastMessage() {
-        return lastMessage;
+    public String getmLastMessage() {
+        return mLastMessage;
     }
 
-    public String getLastMessageDate() {
+    public String getmLastMessageDate() {
         DateFormat dateFormat = DateFormat.getDateInstance(DateFormat.SHORT, Locale.JAPANESE);
-        return dateFormat.format(this.lastMessageDate);
+        return dateFormat.format(this.mLastMessageDate);
     }
 }
